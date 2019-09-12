@@ -217,7 +217,8 @@ function init() {
     // trackballControls.target = sphere.position
 
     // call the render function
-    var step = 0;
+    // var step = 0;
+    var play = false;
 
     var controls = new function () {
         this.outputPlanePos = function () {
@@ -235,6 +236,13 @@ function init() {
                                    'low-pt':12
                                 }
         this.particleIndex = 2;
+        this.play_pause = function () {
+            if (play == false){
+                play = true;
+            } else {
+                play = false;
+            }
+        }
         // this.o
     };
 
@@ -243,6 +251,7 @@ function init() {
     gui.add(controls, 'outputPlanePos');
     gui.add(controls, 'outputCamPos');
     gui.add(controls, 'outputBDir');
+    gui.add(controls, 'play_pause');//, false, true);
 
 
     // data = data_full.filter(function(row) {
@@ -271,7 +280,9 @@ function init() {
     render();
 
     function render() {
-        i ++;
+        if (play == true) {
+            i ++;            
+        }
         // update the stats and the controls
         // trackballControls.update(clock.getDelta());
         stats.update();
