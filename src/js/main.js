@@ -152,6 +152,29 @@ function init() {
     scene.add(epoints);
 
 
+    // Bfield Vector
+    var BDir = new THREE.Vector3( data[i].Bx_scaled, data[i].By_scaled, data[i].Bz_scaled );
+    var BOrigin = electron.position;
+    var BArrowHelper = new THREE.ArrowHelper( BDir.normalize(), BOrigin, BDir.length() * 500, 0xff0000);
+
+    scene.add(BArrowHelper);
+
+    // Force
+    var FDir = new THREE.Vector3( data[i].Fx_scaled, data[i].Fy_scaled, data[i].Fz_scaled );
+    var FOrigin = electron.position;
+    var FArrowHelper = new THREE.ArrowHelper( FDir.normalize(), FOrigin, FDir.length() * 500, 0x00ff00);
+
+    scene.add(FArrowHelper);
+
+    // Velocity
+    var VDir = new THREE.Vector3( data[i].Vx_scaled, data[i].Vy_scaled, data[i].Vz_scaled );
+    var VOrigin = electron.position;
+    var VArrowHelper = new THREE.ArrowHelper( VDir.normalize(), VOrigin, VDir.length() * 500, 0x0000ff);
+
+    scene.add(VArrowHelper);
+
+
+
     // position and point the camera to the center of the scene
     camera.position.x = 0;//1000;//1000;
     camera.position.y = 3000;//2000;
@@ -203,6 +226,9 @@ function init() {
         this.outputCamPos = function () {
             console.log(camera.position);
         }
+        this.outputBDir = function () {
+            console.log(BArrowHelper);
+        }
         this.particleOptionsGUI = {'normal':2,
                                    'smallbounce':15,
                                    'bigbounce':6,
@@ -216,6 +242,7 @@ function init() {
     gui.add(controls, 'particleIndex', controls.particleOptionsGUI);
     gui.add(controls, 'outputPlanePos');
     gui.add(controls, 'outputCamPos');
+    gui.add(controls, 'outputBDir');
 
 
     // data = data_full.filter(function(row) {
@@ -284,6 +311,23 @@ function init() {
         // camera.position.x = pos.X;
         // camera.position.y = pos.Y + 200;
         // camera.position.z = pos.Z - 500;
+
+
+        // BArrowHelper.origin = electron.position;
+        BArrowHelper.position.copy(electron.position);
+        var BDir2 = new THREE.Vector3( data[i % data.length].Bx_scaled, data[i % data.length].By_scaled, data[i % data.length].Bz_scaled );
+        BArrowHelper.setDirection(BDir2.normalize());
+
+        FArrowHelper.position.copy(electron.position);
+        var FDir2 = new THREE.Vector3( data[i % data.length].Fx_scaled, data[i % data.length].Fy_scaled, data[i % data.length].Fz_scaled );
+        FArrowHelper.setDirection(FDir2.normalize());
+
+        VArrowHelper.position.copy(electron.position);
+        var VDir2 = new THREE.Vector3( data[i % data.length].Vx_scaled, data[i % data.length].Vy_scaled, data[i % data.length].Vz_scaled );
+        VArrowHelper.setDirection(VDir2.normalize());
+        // BarrowHelper.setLength(BDir2.length());
+        // BArrowHelper.dir = new THREE.Vector3( data[i % data.length].Bx_scaled, data[i % data.length].By_scaled, data[i % data.length].Bz_scaled );
+    // var BOrigin = electron.position;
 
         // GOOOOOOOD
         camera.position.x = 0;
