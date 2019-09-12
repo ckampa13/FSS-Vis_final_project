@@ -133,8 +133,23 @@ function init() {
         epathGeometry.vertices.push(new THREE.Vector3(data[j].X,data[j].Y,data[j].Z))
     }
     var epath = new THREE.Line( epathGeometry, epathMaterial);
+    
+    var materialParams = {size: 25,
+                          //map: params.sprite,
+                          transparent: true,
+                          alphaTest: 1.,
+                          //sizeAttenuation: params.sizeAttenuation,
+                          vertexColors: THREE.VertexColors };
+                      // };
+    var pointsMaterial = new THREE.PointsMaterial( materialParams );
+    var epoints = new THREE.Points(epathGeometry, pointsMaterial);
+
+
     epath.name = "epath";
+    epoints.name = "epoints";
+    // epath.visible = false;
     scene.add(epath);
+    scene.add(epoints);
 
 
     // position and point the camera to the center of the scene
@@ -203,12 +218,12 @@ function init() {
     gui.add(controls, 'outputCamPos');
 
 
-    data = data_full.filter(function(row) {
-        return row.event == controls.particleIndex;
-    });
+    // data = data_full.filter(function(row) {
+    //     return row.event == controls.particleIndex;
+    // });
 
 
-    var camControls = new THREE.FirstPersonControls(camera);
+/*    var camControls = new THREE.FirstPersonControls(camera);
         camControls.lookSpeed = 0.2;
         camControls.movementSpeed = 500;
         // camControls.noFly = false;
@@ -221,10 +236,10 @@ function init() {
         // camControls.verticalMax = 2.0;
         // camControls.lon = -150;
         // camControls.lat = 120;
+*/
 
-
-    function setCamControls() {
-        }
+    // function setCamControls() {
+    //     }
 
     render();
 
@@ -237,31 +252,43 @@ function init() {
         // animate electron
         data = data_full.filter(function(row) {
         return row.event == controls.particleIndex;
-    });
+        });
         pos = data[i % data.length];
         electron.position.set(pos.X, pos.Y, pos.Z);
 
-        // function removeEntity(object) {
-        var selectedObject = scene.getObjectByName("epath");//epath.name);
-        scene.remove( selectedObject );
-       // animate();
-// }
+        // var selectedObject = scene.getObjectByName("epath");//epath.name);
+        // scene.remove( selectedObject );
+
+        cmap = d3.scaleSequential(d3.interpolateViridis);
+        var extent = [0.0, data[data.length-1].time];
+        // var extent = [0.0, 8.1e-8];
+        cmap.domain(extent).nice();
+
         epathGeometry = new THREE.Geometry();
         // var j;
         for (j = 0; j < data.length; j++) {
             epathGeometry.vertices.push(new THREE.Vector3(data[j].X,data[j].Y,data[j].Z))
+            epathGeometry.colors.push(new THREE.Color(cmap(data[j].time)))
         }
-        var epath = new THREE.Line( epathGeometry, epathMaterial);
-        epath.name = "epath";
-        scene.add(epath);
+        // epathMaterial = new THREE.LineBasicMaterial( { vertexColors: THREE.VertexColors } );
+        // epathMaterial = new THREE.PointsMaterial({ vertexColors: THREE.VertexColors });
+        // vertexColors: THREE.VertexColors
+        // var epath = new THREE.Line( epathGeometry, epathMaterial);
+        // epath.name = "epath";
+        // scene.add(epath);
+        epath.geometry = epathGeometry;
+        epoints.geometry = epathGeometry;
+        // epath.material = epathMaterial;
+
+        epath.visible = true;
         // camera.position.x = pos.X;
         // camera.position.y = pos.Y + 200;
         // camera.position.z = pos.Z - 500;
 
         // GOOOOOOOD
-        // camera.position.x = 0;
-        // camera.position.y = 1000;
-        // camera.position.z = pos.Z - 3000;
+        camera.position.x = 0;
+        camera.position.y = 1000;
+        camera.position.z = pos.Z - 3000;
 
         // var camlook = new THREE.Vector3(0, 1000, electron.position.Z);
 
@@ -277,7 +304,8 @@ function init() {
         if (moveDown == true) {camera.translateY(-100)};*/
 
 
-        camControls.update(clock.getDelta());
+        // camControls.update(clock.getDelta());
+
         // render using requestAnimationFrame
         requestAnimationFrame(render);
         renderer.render(scene, camera);
@@ -289,111 +317,3 @@ function init() {
         renderer.setSize(window.innerWidth, window.innerHeight);
     }    
 }
-
-
-// var data;
-
-function d3Load( filename )
-{
-    var data = d3.json(filename)
-        .then(function(d) {
-            //defineParams();
-            // params.data = d;
-            // console.log(d);
-            // WebGLStart();
-            // return d;
-            // console.log(d);
-            // data = d;
-            // console.log(data);
-            // return data;
-            return d;
-        })
-        .catch(function(error){
-            console.log('ERROR:', error)
-        })
-
-    // console.log(data);
-    return data;
-// 
-// 
-// 
-        // , function(json) {
-// 
-    // });
-}
-
-
-/*function makeTextSprite( message, parameters )
-{
-    if ( parameters === undefined ) parameters = {};
-    
-    var fontface = parameters.hasOwnProperty("fontface") ? 
-        parameters["fontface"] : "Arial";
-    
-    var fontsize = parameters.hasOwnProperty("fontsize") ? 
-        parameters["fontsize"] : 18;
-    
-    var borderThickness = parameters.hasOwnProperty("borderThickness") ? 
-        parameters["borderThickness"] : 4;
-    
-    var borderColor = parameters.hasOwnProperty("borderColor") ?
-        parameters["borderColor"] : { r:0, g:0, b:0, a:1.0 };
-    
-    var backgroundColor = parameters.hasOwnProperty("backgroundColor") ?
-        parameters["backgroundColor"] : { r:255, g:255, b:255, a:1.0 };
-
-    var spriteAlignment = THREE.SpriteAlignment.topLeft;
-        
-    var canvas = document.createElement('canvas');
-    var context = canvas.getContext('2d');
-    context.font = "Bold " + fontsize + "px " + fontface;
-    
-    // get size data (height depends only on font size)
-    var metrics = context.measureText( message );
-    var textWidth = metrics.width;
-    
-    // background color
-    context.fillStyle   = "rgba(" + backgroundColor.r + "," + backgroundColor.g + ","
-                                  + backgroundColor.b + "," + backgroundColor.a + ")";
-    // border color
-    context.strokeStyle = "rgba(" + borderColor.r + "," + borderColor.g + ","
-                                  + borderColor.b + "," + borderColor.a + ")";
-
-    context.lineWidth = borderThickness;
-    roundRect(context, borderThickness/2, borderThickness/2, textWidth + borderThickness, fontsize * 1.4 + borderThickness, 6);
-    // 1.4 is extra height factor for text below baseline: g,j,p,q.
-    
-    // text color
-    context.fillStyle = "rgba(0, 0, 0, 1.0)";
-
-    context.fillText( message, borderThickness, fontsize + borderThickness);
-    
-    // canvas contents will be used for a texture
-    var texture = new THREE.Texture(canvas) 
-    texture.needsUpdate = true;
-
-    var spriteMaterial = new THREE.SpriteMaterial( 
-        { map: texture, useScreenCoordinates: false, alignment: spriteAlignment } );
-    var sprite = new THREE.Sprite( spriteMaterial );
-    sprite.scale.set(100,50,1.0);
-    return sprite;  
-}
-
-// function for drawing rounded rectangles
-function roundRect(ctx, x, y, w, h, r) 
-{
-    ctx.beginPath();
-    ctx.moveTo(x+r, y);
-    ctx.lineTo(x+w-r, y);
-    ctx.quadraticCurveTo(x+w, y, x+w, y+r);
-    ctx.lineTo(x+w, y+h-r);
-    ctx.quadraticCurveTo(x+w, y+h, x+w-r, y+h);
-    ctx.lineTo(x+r, y+h);
-    ctx.quadraticCurveTo(x, y+h, x, y+h-r);
-    ctx.lineTo(x, y+r);
-    ctx.quadraticCurveTo(x, y, x+r, y);
-    ctx.closePath();
-    ctx.fill();
-    ctx.stroke();   
-}
-*/
