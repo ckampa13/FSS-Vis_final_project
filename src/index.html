@@ -10,6 +10,7 @@
     <script type="text/javascript" src="../libs/other/d3.v5.min.js"></script>
     <script type="text/javascript" src="../libs/util/Stats.js"></script>
     <script type="text/javascript" src="../libs/util/dat.gui.js"></script>
+    <script type="text/javascript" src="../libs/other/FirstPersonControls.js"></script>
 
     <script type="text/javascript" src="js/util.js"></script>
 
@@ -20,24 +21,36 @@
 </head>
 
 <body>
-
+    <!-- <div class="plot-box">
+        <iframe src="../assets/plots/ds_bz_phi_0.00.html" allowfullscreen>Your browser doesn't support iFrames.</iframe>
+    </div>
+    <div style="width=50%">
+        <img src="../assets/images/DS_coords_z.png" alt="DS Coordinates Z">
+    </div> -->
     <div id="webgl-output"></div>
-
+    
     <!-- Javascript code that runs our Three.js examples -->
     <script type="text/javascript">
         (function () {
             // your page initialization code here
             // the DOM will be available here
-            var filename = "../assets/data/r05_sr01_e000.json";
+            // var filename = "../assets/data/r05_sr01_e000.json";
+            var filename = "../assets/data/track_data.json";
             d3.json(filename)
                 .then(function(d) {
-                    data = d;
+                    data_full = d;
+                    data = data_full.filter(function(row){
+                        return row.event == 2;
+                    });
+                    // }).then(function(d){
+                        // init();
+                    // })
                     init();
                 })
         .catch(function(error){
             console.log('ERROR:', error)
         })
-            // init()
+            init()
         })();
     </script>
 

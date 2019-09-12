@@ -1,3 +1,4 @@
+var data_full;
 var data;
 var i = 0;
 
@@ -6,7 +7,7 @@ function init() {
     // var data = d3Load("../assets/data/r05_sr01_e000.json");
     // d3Load("../assets/data/r05_sr01_e000.json");
 
-    console.log(data);
+    console.log(data_full);
 
 
     // listen to the resize events
@@ -61,6 +62,8 @@ function init() {
         color: 0xFF0000,
         wireframe: true
     });
+    // var dsMaterial = new.THREE.MeshStandardMaterial({ color: 0x353535, metalness: 1.0 });
+    // var dsMaterial = new.THREE.MeshLambertMaterial({color: 0xffffff});// metalness: 1.0 });
     var ds = new THREE.Mesh( dsGeom, dsMaterial );
 
     // Rotate and Position DS
@@ -69,7 +72,7 @@ function init() {
     ds.castShadow = true;
     ds.receiveShadow = true;
 
-    // scene.add(ds);
+    scene.add(ds);
 
 
     // Tracker Simple
@@ -122,67 +125,21 @@ function init() {
     scene.add(electron);
 
 
+    // electron path
+    var epathMaterial = new THREE.LineBasicMaterial( { color: 0x0000ff } );
+    var epathGeometry = new THREE.Geometry();
+    var j;
+    for (j = 0; j < data.length; j++) {
+        epathGeometry.vertices.push(new THREE.Vector3(data[j].X,data[j].Y,data[j].Z))
+    }
+    var epath = new THREE.Line( epathGeometry, epathMaterial);
+    epath.name = "epath";
+    scene.add(epath);
 
-
-    // LOAD DATA test 1
-    // var objectLoader = new THREE.JSONLoader();
-    // console.log(objectLoader);
-    // objectLoader.load("../assets/data/r05_sr01_e000.json", function (obj) {
-    //     console.log(obj);
-    //     return obj;
-    // });
-    // var data = objectLoader.parse("../assets/data/r05_sr01_e000.json");
-
-    // console.log(data);
-
-
-
-
-    // text sprites!
-    // var spriteTrack = makeTextSprite( "Tracker", 
-    //     { fontsize: 24, borderColor: {r:0, g:0, b:255, a:1.0}, backgroundColor: {r:0, g:0, b:100, a:0.6} } );
-    // spriteTrack.position.set(tracker.position);
-    // scene.add( spriteTrack );
-
-/*    var spritey = makeTextSprite( " World! ", 
-        { fontsize: 32, fontface: "Georgia", borderColor: {r:0, g:0, b:255, a:1.0} } );
-    spritey.position.set(55,105,55);
-    scene.add( spritey );
-*/
-
-
-    // create a cube
-    var cubeGeometry = new THREE.BoxGeometry(400, 400, 400);
-    var cubeMaterial = new THREE.MeshLambertMaterial({ color: 0xff0000 });
-    var cube = new THREE.Mesh(cubeGeometry, cubeMaterial);
-    cube.castShadow = true;
-
-    // position the cube
-    cube.position.x = -4;
-    cube.position.y = 300 - 2700;
-    cube.position.z = 0;//8689.;
-
-    // add the cube to the scene
-    // scene.add(cube);
-
-    var sphereGeometry = new THREE.SphereGeometry(400, 20, 20);
-    var sphereMaterial = new THREE.MeshLambertMaterial({ color: 0x7777ff });
-    var sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
-
-    // position the sphere
-    sphere.position.x = 20;
-    sphere.position.y = -2700;
-    sphere.position.z = 1000;//8689. + 1000;
-    sphere.castShadow = true;
-
-    // add the sphere to the scene
-    // scene.add(sphere);
-
-    // scene.translateZ(8689.);
 
     // position and point the camera to the center of the scene
     camera.position.x = 0;//1000;//1000;
-    camera.position.y = 1000;//2000;
+    camera.position.y = 3000;//2000;
     camera.position.z = 0;//6000;//9000;  
     //camera.position.set(-13500., 850., 8000.)
     
@@ -192,17 +149,20 @@ function init() {
 
     // camera.lookAt(scene.position);
     // camera.lookAt(plane.position);
-    camera.lookAt(electron.position);
-
+    // camera.lookAt(electron.position);
+    var camLook = new THREE.Vector3(0,0, electron.position.z);
+    // console.log(camLook);
+    camera.lookAt(camLook);
+    
     // add subtle ambient lighting
     var ambienLight = new THREE.AmbientLight(0x353535);
     scene.add(ambienLight);
 
     // add spotlight for the shadows
-    var spotLight = new THREE.SpotLight(0xffffff);
-    spotLight.position.set(0, 0, 2000);//8689+1000);
-    spotLight.castShadow = true;
-    scene.add(spotLight);
+    // var spotLight = new THREE.SpotLight(0xffffff);
+    // spotLight.position.set(0, 0, 2000);//8689+1000);
+    // spotLight.castShadow = true;
+    // scene.add(spotLight);
 
     var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
     directionalLight.position.set(-.25,1,-1);
@@ -213,7 +173,7 @@ function init() {
 
      // initialize the trackball controls and the clock which is needed
     // var trackballControls = initTrackballControls(camera, renderer);
-    // var clock = new THREE.Clock();
+    var clock = new THREE.Clock();
     // trackballControls.target = new THREE.Vector3(0,-2700,8689);
     //trackballControls.target = plane.position
     // trackballControls.target = sphere.position
@@ -222,54 +182,102 @@ function init() {
     var step = 0;
 
     var controls = new function () {
-        this.rotationSpeed = 0.02;
-        this.bouncingSpeed = 0.03;
         this.outputPlanePos = function () {
             console.log(plane.position);
         }
         this.outputCamPos = function () {
             console.log(camera.position);
         }
+        this.particleOptionsGUI = {'normal':2,
+                                   'smallbounce':15,
+                                   'bigbounce':6,
+                                   'low-pt':12
+                                }
+        this.particleIndex = 2;
+        // this.o
     };
 
     var gui = new dat.GUI();
-    gui.add(controls, 'rotationSpeed', 0, 0.5);
-    gui.add(controls, 'bouncingSpeed', 0, 0.5);
+    gui.add(controls, 'particleIndex', controls.particleOptionsGUI);
     gui.add(controls, 'outputPlanePos');
     gui.add(controls, 'outputCamPos');
+
+
+    data = data_full.filter(function(row) {
+        return row.event == controls.particleIndex;
+    });
+
+
+    var camControls = new THREE.FirstPersonControls(camera);
+        camControls.lookSpeed = 0.2;
+        camControls.movementSpeed = 500;
+        // camControls.noFly = false;
+        // camControls.lookVertical = true;
+        camControls.target = new THREE.Vector3(1000,0,0);
+        // camControls.target = new THREE.Vector3(0,0,1000);
+        camControls.object.position.set(0,0,0);
+        // camControls.constrainVertical = true;
+        // camControls.verticalMin = 1.0;
+        // camControls.verticalMax = 2.0;
+        // camControls.lon = -150;
+        // camControls.lat = 120;
+
+
+    function setCamControls() {
+        }
 
     render();
 
     function render() {
         i ++;
-        // console.log(data);
-        // console.log(i);
         // update the stats and the controls
         // trackballControls.update(clock.getDelta());
         stats.update();
 
         // animate electron
+        data = data_full.filter(function(row) {
+        return row.event == controls.particleIndex;
+    });
         pos = data[i % data.length];
-        // console.log(p);
         electron.position.set(pos.X, pos.Y, pos.Z);
-        camera.position.x = pos.X;
-        camera.position.y = pos.Y + 200;
-        camera.position.z = pos.Z - 500;
 
-        camera.lookAt(electron.position);
+        // function removeEntity(object) {
+        var selectedObject = scene.getObjectByName("epath");//epath.name);
+        scene.remove( selectedObject );
+       // animate();
+// }
+        epathGeometry = new THREE.Geometry();
+        // var j;
+        for (j = 0; j < data.length; j++) {
+            epathGeometry.vertices.push(new THREE.Vector3(data[j].X,data[j].Y,data[j].Z))
+        }
+        var epath = new THREE.Line( epathGeometry, epathMaterial);
+        epath.name = "epath";
+        scene.add(epath);
+        // camera.position.x = pos.X;
+        // camera.position.y = pos.Y + 200;
+        // camera.position.z = pos.Z - 500;
+
+        // GOOOOOOOD
+        // camera.position.x = 0;
+        // camera.position.y = 1000;
+        // camera.position.z = pos.Z - 3000;
+
+        // var camlook = new THREE.Vector3(0, 1000, electron.position.Z);
+
+        // camera.lookAt(electron.position);
+        // camera.lookAt(new THREE.Vector3(0,0,electron.position.Z));
+        // camera.lookAt(camlook);
+
+        /*if (moveForward == true) {camera.translateZ(-500)};
+        if (moveBackward == true) {camera.translateZ(500)};
+        if (moveLeft == true) {camera.translateX(-100)};
+        if (moveRight == true) {camera.translateX(100)};
+        if (moveUp == true) {camera.translateY(100)};
+        if (moveDown == true) {camera.translateY(-100)};*/
 
 
-
-        // rotate the cube around its axes
-        cube.rotation.x += controls.rotationSpeed;
-        cube.rotation.y += controls.rotationSpeed;
-        cube.rotation.z += controls.rotationSpeed;
-
-        // bounce the sphere up and down
-        step += controls.bouncingSpeed;
-        sphere.position.x = 20 + (100 * (Math.cos(step)));
-        sphere.position.y = 2-2700 + (1000 * Math.abs(Math.sin(step)));
-
+        camControls.update(clock.getDelta());
         // render using requestAnimationFrame
         requestAnimationFrame(render);
         renderer.render(scene, camera);
