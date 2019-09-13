@@ -153,6 +153,12 @@ a {
 	margin: 200px;
 }
 
+#readme {
+	position: relative;
+	width: 50%;
+	text-align: center;
+}
+
 div {
 	/*border: 1px solid black;*/
 }
