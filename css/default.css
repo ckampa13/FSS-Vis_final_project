@@ -11,7 +11,7 @@ body {
  	/*max-height: 1000px;*/
  	/*min-height: 700px;*/
  	width: 100%;
- 	height: 50%;
+ 	/*height: 50%;*/
  	/*border: black 1px solid;*/
  	/*border-radius: 10px;*/
   	/*padding-top:   66.6%;  This is your aspect ratio */
@@ -23,19 +23,21 @@ body {
   	/*z-index: 10;*/
   	/*display: none;*/
   	display: 'block';
-  	opacity: .7;
-  	margin: 50px 50px;
+  	opacity: .8;
+  	/*margin: 50px 50px;*/
 }
 
 .plot-box iframe {
    border: 0;
-   height: 100%;
+   height: 82%;
    /*left: 100px;*/
    left: 0;
    position: absolute;
    top: 0;
    width: 100%;
    /*opacity: 0.9;*/
+   /*background-color: white;*/
+   /*opacity: 1.;*/
 }
 
 #webgl-output {
@@ -45,9 +47,13 @@ body {
 #mainmenu {
 	position: absolute;
 	/*z-index: 10;*/
-	width: 95%;
+	width: 100%;
 	height: 50px;
 	text-align: center;
 	color: white;
-	top: 100px;
+	/*top: 100px;*/
+}
+
+#outer {
+	text-align: center;
 }

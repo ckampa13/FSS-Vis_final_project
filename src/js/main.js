@@ -18,7 +18,7 @@ function init() {
     var renderer;
 
     // initialize stats
-    var stats = initStats();
+    // var stats = initStats();
 
 
     // create a scene, that will hold all our elements such as objects, cameras and lights.
@@ -95,7 +95,7 @@ function init() {
     // Tracker Simple
     // var trackerGeom = new THREE.CylinderGeometry( 680, 680, 3270, 64 );
     var trackerGeom = new THREE.CylinderGeometry( 810, 810, 3270, 64 );
-    var trackerMaterial = new THREE.MeshLambertMaterial({ color: 0x0000ff,
+    var trackerMaterial = new THREE.MeshLambertMaterial({ color: 0xebcb4d,
         opacity: 0.5, transparent: true});
     var tracker = new THREE.Mesh( trackerGeom, trackerMaterial );
 
@@ -113,7 +113,7 @@ function init() {
     // Stopping Target Simple
     // var trackerGeom = new THREE.CylinderGeometry( 680, 680, 3270, 64 );
     var stopTargGeom = new THREE.CylinderGeometry( 75, 75, 800, 64 );
-    var stopTargMaterial = new THREE.MeshLambertMaterial({ color: 0x00ff00,
+    var stopTargMaterial = new THREE.MeshLambertMaterial({ color: 0xff0000,
         opacity: 0.5, transparent: true});
     var stopTarg = new THREE.Mesh( stopTargGeom, stopTargMaterial );
 
@@ -129,7 +129,7 @@ function init() {
 
     // electron!
     var electronGeometry = new THREE.SphereGeometry(40, 20, 20);
-    var electronMaterial = new THREE.MeshLambertMaterial({ color: 0xff0000 });
+    var electronMaterial = new THREE.MeshLambertMaterial({ color: 0x00ff00 });
     var electron = new THREE.Mesh(electronGeometry, electronMaterial);
 
     // position the electron
@@ -287,7 +287,18 @@ function init() {
     // console.log(controls);
 
     var monitor = new function () {
+        this.X=0;
+        this.Y=0;
+        this.Z=0;
         this.Vx=0;
+        this.Vy=0;
+        this.Vz=0;
+        this.Bx=0;
+        this.By=0;
+        this.Bz=0;
+        this.Fx=0;
+        this.Fy=0;
+        this.Fz=0;
         this.time=0;
         this.i = i;
         // this.V = {'Vx': pos.Vx, 'Vy': pos.Vy, 'Vz': pos.Vz};
@@ -412,9 +423,28 @@ function init() {
     f0.add(visibility, 'OriginAxes');
 
     var f1 = gui.addFolder('Monitor');
+    var f10 = f1.addFolder('Position');
     var f11 = f1.addFolder('Velocity');
-    f1.add(monitor, 'Vx').listen();
-    f1.add(monitor, 'time').listen();
+    var f12 = f1.addFolder('Magnetic Field');
+    var f13 = f1.addFolder('Force');
+
+    f10.add(monitor, 'X').listen();
+    f10.add(monitor, 'Y').listen();
+    f10.add(monitor, 'Z').listen();
+
+    f11.add(monitor, 'Vx').listen();
+    f11.add(monitor, 'Vy').listen();
+    f11.add(monitor, 'Vz').listen();
+
+    f12.add(monitor, 'Bx').listen();
+    f12.add(monitor, 'By').listen();
+    f12.add(monitor, 'Bz').listen();
+
+    f13.add(monitor, 'Fx').listen();
+    f13.add(monitor, 'Fy').listen();
+    f13.add(monitor, 'Fz').listen();
+
+    // f1.add(monitor, 'time').listen();
     // f1.add(monitor, 'z', -10, 10);
 
     var f2 = gui.addFolder("Camera Contols");
@@ -468,7 +498,7 @@ function init() {
         }
         // update the stats and the controls
         // trackballControls.update(clock.getDelta());
-        stats.update();
+        // stats.update();
 
         // animate electron
         data = data_full.filter(function(row) {
@@ -478,7 +508,18 @@ function init() {
         electron.position.set(pos.X, pos.Y, pos.Z);
 
         // monitor.V = {'Vx': pos.Vx, 'Vy': pos.Vy, 'Vz': pos.Vz};
+        monitor.X = pos.X;
+        monitor.Y = pos.Y;
+        monitor.Z = pos.Z;
         monitor.Vx = pos.Vx;
+        monitor.Vy = pos.Vy;
+        monitor.Vz = pos.Vz;
+        monitor.Bx = pos.Bx;
+        monitor.By = pos.By;
+        monitor.Bz = pos.Bz;
+        monitor.Fx = pos.Fx;
+        monitor.Fy = pos.Fy;
+        monitor.Fz = pos.Fz;
         monitor.time = pos.time;
         // monitor.i = i;
         // var selectedObject = scene.getObjectByName("epath");//epath.name);
