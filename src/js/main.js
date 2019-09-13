@@ -110,8 +110,9 @@ function init() {
 
     scene.add(tracker);
 
+
     // Stopping Target Simple
-    // var trackerGeom = new THREE.CylinderGeometry( 680, 680, 3270, 64 );
+    var trackerGeom = new THREE.CylinderGeometry( 680, 680, 3270, 64 );
     var stopTargGeom = new THREE.CylinderGeometry( 75, 75, 800, 64 );
     var stopTargMaterial = new THREE.MeshLambertMaterial({ color: 0xff0000,
         opacity: 0.5, transparent: true});
@@ -122,10 +123,49 @@ function init() {
     stopTarg.position.set(0, 0, 5871.);
     stopTarg.castShadow = true;
 
-
     scene.add(stopTarg);
 
 
+
+    // test lathe
+    // var pts = [
+    //         new THREE.Vector3(75.,0,800.),//top left
+    //         new THREE.Vector3(21.5,0,800.),//top right
+    //         new THREE.Vector3(21.5,0,0),//bottom right
+    //         new THREE.Vector3(75.0,0,0),//bottom left
+    //         new THREE.Vector3(75.0,0,800.)//back to top left - close square path
+    //        ];
+    // var mesh = new THREE.Mesh( new THREE.LatheGeometry( pts, 12 ), new THREE.MeshLambertMaterial( { color: 0x2D303D, wireframe: true, shading: THREE.FlatShading } ));
+    // // mesh.position.y = 150;
+    // mesh.overdraw = true;
+    // mesh.doubleSided = true;
+
+    // scene.add( mesh );
+
+
+    /*// Stopping target with hole
+    var ringST = new THREE.RingGeometry( 21.5, 75.0 );
+
+    var extrudeSettings = {
+        steps: 2,
+        depth: 800,
+        bevelEnabled: false
+    };
+
+    var stopTargGeomExtrude = new THREE.ExtrudeGeometry( new THREE.Shape(ringST), extrudeSettings );
+    var stopTargMaterial = new THREE.MeshLambertMaterial({ color: 0xff0000,
+        opacity: 0.5, transparent: true});
+
+    // var stopTarg = new THREE.Mesh( stopTargGeomExtrude, stopTargMaterial );
+    var stopTarg = new THREE.Mesh( ringST, stopTargMaterial );
+
+    // Rotate and Position stopTarg
+    // stopTarg.rotation.x = -0.5 * Math.PI;
+    stopTarg.position.set(0, 0, 5871.);
+    stopTarg.castShadow = true;
+
+    scene.add(stopTarg);
+*/
 
     // electron!
     var electronGeometry = new THREE.SphereGeometry(40, 20, 20);
@@ -444,7 +484,7 @@ function init() {
     f13.add(monitor, 'Fy').listen();
     f13.add(monitor, 'Fz').listen();
 
-    // f1.add(monitor, 'time').listen();
+    f1.add(monitor, 'time').listen();
     // f1.add(monitor, 'z', -10, 10);
 
     var f2 = gui.addFolder("Camera Contols");
@@ -511,16 +551,16 @@ function init() {
         monitor.X = pos.X;
         monitor.Y = pos.Y;
         monitor.Z = pos.Z;
-        monitor.Vx = pos.Vx;
-        monitor.Vy = pos.Vy;
-        monitor.Vz = pos.Vz;
-        monitor.Bx = pos.Bx;
-        monitor.By = pos.By;
-        monitor.Bz = pos.Bz;
+        monitor.Vx = pos.Vx / 3e8;
+        monitor.Vy = pos.Vy / 3e8;
+        monitor.Vz = pos.Vz / 3e8;
+        monitor.Bx = pos.Bx*10000;
+        monitor.By = pos.By*10000;
+        monitor.Bz = pos.Bz*10000;
         monitor.Fx = pos.Fx;
         monitor.Fy = pos.Fy;
         monitor.Fz = pos.Fz;
-        monitor.time = pos.time;
+        monitor.time = pos.time*1e9;
         // monitor.i = i;
         // var selectedObject = scene.getObjectByName("epath");//epath.name);
         // scene.remove( selectedObject );
