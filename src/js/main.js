@@ -57,13 +57,15 @@ function init() {
 
 
     // DS Cryo
-    var dsGeom = new THREE.CylinderGeometry( 1900., 1900., 10900., 16, 16, true );
-    var dsMaterial = new THREE.MeshBasicMaterial({
-        color: 0xFF0000,
-        wireframe: true
+    var dsGeom = new THREE.CylinderGeometry( 1900., 1900., 10900., 32, 32, true );
+    var dsMaterial = new THREE.MeshLambertMaterial({
+        color: 0x353535,
+        wireframe: false,
+        side:THREE.DoubleSide,
+        metalness: 1.0
     });
     // var dsMaterial = new.THREE.MeshStandardMaterial({ color: 0x353535, metalness: 1.0 });
-    // var dsMaterial = new.THREE.MeshLambertMaterial({color: 0xffffff});// metalness: 1.0 });
+    // var dsMaterial = new.THREE.MeshLambertMaterial({color: 0xffffff});//side:THREE.DoubleSide});// metalness: 1.0 });
     var ds = new THREE.Mesh( dsGeom, dsMaterial );
 
     // Rotate and Position DS
@@ -134,10 +136,10 @@ function init() {
     }
     var epath = new THREE.Line( epathGeometry, epathMaterial);
     
-    var materialParams = {size: 25,
+    var materialParams = {size: 20,
                           //map: params.sprite,
                           transparent: true,
-                          alphaTest: 1.,
+                          alphaTest: 0.9,
                           //sizeAttenuation: params.sizeAttenuation,
                           vertexColors: THREE.VertexColors };
                       // };
@@ -206,6 +208,11 @@ function init() {
     directionalLight.position.set(-.25,1,-1);
     scene.add( directionalLight );
 
+    var pointLight = new THREE.PointLight();
+    pointLight.position.set(stopTarg.position);
+
+    scene.add( pointLight );
+
     // add the output of the renderer to the html element
     document.getElementById("webgl-output").appendChild(renderer.domElement);
 
@@ -221,15 +228,15 @@ function init() {
     var play = false;
 
     var controls = new function () {
-        this.outputPlanePos = function () {
-            console.log(plane.position);
-        }
-        this.outputCamPos = function () {
-            console.log(camera.position);
-        }
-        this.outputBDir = function () {
-            console.log(BArrowHelper);
-        }
+        // this.outputPlanePos = function () {
+        //     console.log(plane.position);
+        // }
+        // this.outputCamPos = function () {
+        //     console.log(camera.position);
+        // }
+        // this.outputBDir = function () {
+        //     console.log(BArrowHelper);
+        // }
         this.particleOptionsGUI = {'normal':2,
                                    'smallbounce':15,
                                    'bigbounce':6,
@@ -243,14 +250,17 @@ function init() {
                 play = false;
             }
         }
+        // this.velocity_x = data.Vx;
         // this.o
     };
 
     var gui = new dat.GUI();
     gui.add(controls, 'particleIndex', controls.particleOptionsGUI);
-    gui.add(controls, 'outputPlanePos');
-    gui.add(controls, 'outputCamPos');
-    gui.add(controls, 'outputBDir');
+    // gui.add(controls, 'outputPlanePos');
+    // gui.add(controls, 'outputCamPos');
+    // gui.add(controls, 'outputBDir');
+    // gui.add(i, 'Vx').listen();
+    gui.add(pos, 'Vx').listen();
     gui.add(controls, 'play_pause');//, false, true);
 
 
