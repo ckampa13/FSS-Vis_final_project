@@ -56,13 +56,28 @@ function init() {
     scene.add(plane);
 
 
+
+    // var element = document.createElement( 'img' );
+    // element.src = '../../assets/images/cd3-ce-and-backgrounds.pdf'
+
+    // var cssObject = new THREE.CSS3DObject( element );
+    // cssObject.position = plane.position;
+    // cssObject.rotation = plane.rotation;
+    // scene.add(cssObject);
+
+
+
+
+
+
     // DS Cryo
     var dsGeom = new THREE.CylinderGeometry( 1900., 1900., 10900., 32, 32, true );
     var dsMaterial = new THREE.MeshLambertMaterial({
-        color: 0x353535,
+        color: 0x7a7a7a,
         wireframe: false,
         side:THREE.DoubleSide,
-        metalness: 1.0
+        // metalness: 1.0,
+        // roughness: 0.2
     });
     // var dsMaterial = new.THREE.MeshStandardMaterial({ color: 0x353535, metalness: 1.0 });
     // var dsMaterial = new.THREE.MeshLambertMaterial({color: 0xffffff});//side:THREE.DoubleSide});// metalness: 1.0 });
@@ -118,9 +133,9 @@ function init() {
     var electron = new THREE.Mesh(electronGeometry, electronMaterial);
 
     // position the electron
-    var pos = data[0];
-    console.log(pos);
-    electron.position.set(pos.X, pos.Y, pos.Z);
+    // var pos = data[0];
+    // console.log(pos);
+    // electron.position.set(pos.X, pos.Y, pos.Z);
     electron.castShadow = true;
 
     // add the electron to the scene
@@ -132,6 +147,7 @@ function init() {
     var epathGeometry = new THREE.Geometry();
     var j;
     for (j = 0; j < data.length; j++) {
+    // for (j = 0; j < 100; j++) {
         epathGeometry.vertices.push(new THREE.Vector3(data[j].X,data[j].Y,data[j].Z))
     }
     var epath = new THREE.Line( epathGeometry, epathMaterial);
@@ -195,7 +211,7 @@ function init() {
     camera.lookAt(camLook);
     
     // add subtle ambient lighting
-    var ambienLight = new THREE.AmbientLight(0x353535);
+    var ambienLight = new THREE.AmbientLight(0x151515);
     scene.add(ambienLight);
 
     // add spotlight for the shadows
@@ -205,11 +221,11 @@ function init() {
     // scene.add(spotLight);
 
     var directionalLight = new THREE.DirectionalLight( 0xffffff, 0.5 );
-    directionalLight.position.set(-.25,1,-1);
+    directionalLight.position.set(0,10,0);
     scene.add( directionalLight );
 
     var pointLight = new THREE.PointLight();
-    pointLight.position.set(stopTarg.position);
+    pointLight.position.set(0, 0, 0);
 
     scene.add( pointLight );
 
@@ -226,6 +242,7 @@ function init() {
     // call the render function
     // var step = 0;
     var play = false;
+    var flip = false;
 
     var controls = new function () {
         // this.outputPlanePos = function () {
@@ -243,6 +260,9 @@ function init() {
                                    'low-pt':12
                                 }
         this.particleIndex = 2;
+        this.reset = function() {
+            i = 0;
+        }
         this.play_pause = function () {
             if (play == false){
                 play = true;
@@ -250,17 +270,170 @@ function init() {
                 play = false;
             }
         }
+
+        this.flip_cam = function () {
+            if (flip == false) {
+                flip = true;
+            } else {
+                flip = false;
+            }
+        }
         // this.velocity_x = data.Vx;
         // this.o
+        this.camRadius = 3000;
+        this.camTheta = 1.2;//Math.PI/2;
+        this.camPhi = 0;
+    };
+    // console.log(controls);
+
+    var monitor = new function () {
+        this.Vx=0;
+        this.time=0;
+        this.i = i;
+        // this.V = {'Vx': pos.Vx, 'Vy': pos.Vy, 'Vz': pos.Vz};
     };
 
+    var visibility = new function () {
+        this.DetectorSolenoid = function () {
+            if (ds.visible == true) {
+                ds.visible = false;
+            } else {
+                ds.visible = true;
+            }
+        }
+        this.StoppingTarget = function () {
+            if (stopTarg.visible == true) {
+                stopTarg.visible = false;
+            } else {
+                stopTarg.visible = true;
+            }
+        }
+        this.Tracker = function () {
+            if (tracker.visible == true) {
+                tracker.visible = false;
+            } else {
+                tracker.visible = true;
+            }
+        }
+        this.Electron = function () {
+            if (electron.visible == true) {
+                electron.visible = false;
+            } else {
+                electron.visible = true;
+            }
+        }
+        this.ElectronTrack = function () {
+            if (epath.visible == true) {
+                epath.visible = false;
+            } else {
+                epath.visible = true;
+            }
+        }
+        this.ElectronTiming = function () {
+            if (epoints.visible == true) {
+                epoints.visible = false;
+            } else {
+                epoints.visible = true;
+            }
+        }
+        this.Plane = function () {
+            if (plane.visible == true) {
+                plane.visible = false;
+            } else {
+                plane.visible = true;
+            }
+        }
+        this.OriginAxes = function () {
+            if (axes.visible == true) {
+                axes.visible = false;
+            } else {
+                axes.visible = true;
+            }
+        }
+        this.MagneticField = function () {
+            if (BArrowHelper.visible == true) {
+                BArrowHelper.visible = false;
+            } else {
+                BArrowHelper.visible = true;
+            }
+        }
+        this.Velocity = function () {
+            if (VArrowHelper.visible == true) {
+                VArrowHelper.visible = false;
+            } else {
+                VArrowHelper.visible = true;
+            }
+        }
+        this.Force = function () {
+            if (FArrowHelper.visible == true) {
+                FArrowHelper.visible = false;
+            } else {
+                FArrowHelper.visible = true;
+            }
+        }
+    }
+
+    var menu = new function () {
+        this.mainmenu = function () {
+            var x = document.getElementById("mainmenu");
+            console.log(x.style.display);
+            if (x.style.display == "none") {
+                x.style.display = "block";
+            } else {
+                x.style.display = "none";
+            }
+            console.log(x.style.display);
+            // if (MenuHtml.visible == true) {
+            //     MenuHtml.visible = false;
+            // } else {
+            //     MenuHtml.visible = true;
+            // }
+        }
+    }
+
+
+
     var gui = new dat.GUI();
-    gui.add(controls, 'particleIndex', controls.particleOptionsGUI);
+
+    gui.add(controls, 'particleIndex', controls.particleOptionsGUI).onChange(function() {i=0});
+
+    var f0 = gui.addFolder('Toggle Elements');
+    var f00 = f0.addFolder ('Vectors');
+    f00.add(visibility, 'MagneticField');
+    f00.add(visibility, 'Velocity');
+    f00.add(visibility, 'Force');
+    f0.add(visibility, 'DetectorSolenoid');
+    f0.add(visibility, 'StoppingTarget');
+    f0.add(visibility, 'Tracker');
+    f0.add(visibility, 'Electron');
+    f0.add(visibility, 'ElectronTrack');
+    f0.add(visibility, 'ElectronTiming');
+    f0.add(visibility, 'Plane');
+    f0.add(visibility, 'OriginAxes');
+
+    var f1 = gui.addFolder('Monitor');
+    var f11 = f1.addFolder('Velocity');
+    f1.add(monitor, 'Vx').listen();
+    f1.add(monitor, 'time').listen();
+    // f1.add(monitor, 'z', -10, 10);
+
+    var f2 = gui.addFolder("Camera Contols");
+    f2.add(controls, 'flip_cam');
+    f2.add(controls, 'camRadius', 500, 5000);
+    f2.add(controls, 'camTheta', 0, Math.PI);
+    f2.add(controls, 'camPhi', -Math.PI, Math.PI);
+
+
     // gui.add(controls, 'outputPlanePos');
     // gui.add(controls, 'outputCamPos');
     // gui.add(controls, 'outputBDir');
     // gui.add(i, 'Vx').listen();
-    gui.add(pos, 'Vx').listen();
+    // gui.add(pos, 'Vx').listen();
+    // gui.add(monitor, 'Vx').listen();
+    // gui.add(monitor, 'time').listen();
+    // gui.add(monitor, 'i').listen();
+    gui.add(menu, 'mainmenu');
+    gui.add(controls, 'reset');
     gui.add(controls, 'play_pause');//, false, true);
 
 
@@ -304,6 +477,10 @@ function init() {
         pos = data[i % data.length];
         electron.position.set(pos.X, pos.Y, pos.Z);
 
+        // monitor.V = {'Vx': pos.Vx, 'Vy': pos.Vy, 'Vz': pos.Vz};
+        monitor.Vx = pos.Vx;
+        monitor.time = pos.time;
+        // monitor.i = i;
         // var selectedObject = scene.getObjectByName("epath");//epath.name);
         // scene.remove( selectedObject );
 
@@ -328,7 +505,7 @@ function init() {
         epoints.geometry = epathGeometry;
         // epath.material = epathMaterial;
 
-        epath.visible = true;
+        // epath.visible = true;
         // camera.position.x = pos.X;
         // camera.position.y = pos.Y + 200;
         // camera.position.z = pos.Z - 500;
@@ -351,9 +528,24 @@ function init() {
     // var BOrigin = electron.position;
 
         // GOOOOOOOD
-        camera.position.x = 0;
-        camera.position.y = 1000;
-        camera.position.z = pos.Z - 3000;
+        // camera.position.x = 0;
+        // camera.position.y = 1000;
+        // camera.position.z = pos.Z - 3000;
+
+        camera.position.x = - controls.camRadius * Math.sin(controls.camTheta) * Math.sin(controls.camPhi);
+        camera.position.y = controls.camRadius * Math.cos(controls.camTheta); //* Math.sin(controls.camPhi);
+        if (flip == false) {
+            camera.position.z = pos.Z - controls.camRadius * Math.sin(controls.camTheta) * Math.cos(controls.camPhi);
+        } else {
+            camera.position.z = pos.Z + controls.camRadius * Math.sin(controls.camTheta) * Math.cos(controls.camPhi);
+        };
+
+        // camLook = new THREE.Vector3(0,0, electron.position.z);
+        camLook = new THREE.Vector3(data[0].X,data[0].Y, electron.position.z);
+        // console.log(camLook);
+        camera.lookAt(camLook);
+
+
 
         // var camlook = new THREE.Vector3(0, 1000, electron.position.Z);
 
